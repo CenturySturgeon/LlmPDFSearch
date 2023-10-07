@@ -13,7 +13,7 @@ from constants import CHROMA_SETTINGS
 #model and tokenizer loading
 checkpoint = "LaMini-T5-738M"
 tokenizer = AutoTokenizer.from_pretrained(checkpoint)
-base_model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint, device_map='auto', torch_dtype=torch.float32)
+base_model = AutoModelForSeq2SeqLM.from_pretrained(checkpoint, device_map='auto', torch_dtype=torch.bfloat16 )
 
 @st.cache_resource
 def llm_pipeline():
