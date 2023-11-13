@@ -2,4 +2,5 @@ db/
 __pycache__/
 ignore/
 Instructions.txt
+.DS_Store
 .env

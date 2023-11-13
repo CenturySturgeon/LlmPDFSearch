@@ -1,6 +1,6 @@
 import fitz  # PyMuPDF
 
-def extract_text_from_pdf(pdf_path):
+def extract_pdf_sections(pdf_path):
     # Open the PDF file
     pdf_document = fitz.open(pdf_path)
 
@@ -11,9 +11,14 @@ def extract_text_from_pdf(pdf_path):
     for page_number in range(pdf_document.page_count):
         # Get the page
         page = pdf_document[page_number]
+        # print(f"PAGE NUMBER {page_number + 1}\n")
 
-        # Extract text from the page
-        text += page.get_text()
+        # Extract paragraphs from the page
+        text = page.get_text("blocks")
+        if page_number == 1:
+            for block in text:
+                print(block[4])
+                print("\n")
 
     # Close the PDF file
     pdf_document.close()
@@ -21,8 +26,5 @@ def extract_text_from_pdf(pdf_path):
     return text
 
 # Replace 'your_pdf_file.pdf' with the path to your PDF file
-pdf_path = 'ChromaDB.pdf'
-extracted_text = extract_text_from_pdf(pdf_path)
-
-# Print or use the extracted text as needed
-print(extracted_text)
+pdf_path = 'TheRoadNotTaken.pdf'
+extracted_text = extract_pdf_sections(pdf_path)
