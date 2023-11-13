@@ -1,4 +1,5 @@
 db/
 __pycache__/
+ignore/
 Instructions.txt
 .env
