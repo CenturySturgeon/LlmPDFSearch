@@ -21,7 +21,7 @@ def extract_text_from_pdf(pdf_path):
     return text
 
 # Replace 'your_pdf_file.pdf' with the path to your PDF file
-pdf_path = 'MagDrivePump.pdf'
+pdf_path = 'ChromaDB.pdf'
 extracted_text = extract_text_from_pdf(pdf_path)
 
 # Print or use the extracted text as needed
