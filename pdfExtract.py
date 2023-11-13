@@ -1,6 +1,14 @@
+import os
 import fitz  # PyMuPDF
 
 def extract_pdf_sections(pdf_path):
+    documents = []
+    metadatas = []
+    ids = []
+    idIndex = 0
+
+    # Get the document's name
+    document_name = os.path.basename(pdf_path)
     # Open the PDF file
     pdf_document = fitz.open(pdf_path)
 
@@ -11,20 +19,22 @@ def extract_pdf_sections(pdf_path):
     for page_number in range(pdf_document.page_count):
         # Get the page
         page = pdf_document[page_number]
-        # print(f"PAGE NUMBER {page_number + 1}\n")
 
         # Extract paragraphs from the page
         text = page.get_text("blocks")
-        if page_number == 1:
-            for block in text:
-                print(block[4])
-                print("\n")
+        
+        for index, block in enumerate(text):
+            documents.append(block[4])
+            metadatas.append({"source": document_name, "page": page_number + 1, "paragraph":  index + 1})
+            ids.append("id" + str(idIndex + 1))
 
     # Close the PDF file
     pdf_document.close()
 
-    return text
+    return documents, metadatas, ids
 
 # Replace 'your_pdf_file.pdf' with the path to your PDF file
 pdf_path = 'TheRoadNotTaken.pdf'
-extracted_text = extract_pdf_sections(pdf_path)
+docs, mets, ids = extract_pdf_sections(pdf_path)
+
+print(len(docs), len(mets), len(ids))

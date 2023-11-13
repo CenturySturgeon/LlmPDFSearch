@@ -44,7 +44,7 @@ collection.add(
 
 results = collection.query(
     query_texts=["What is the university name?"],
-    n_results=1
+    n_results=2
 )
 
 print("\n")
