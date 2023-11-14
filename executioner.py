@@ -50,5 +50,20 @@ class LocalShell(object):
 # shell._write("ls\n".encode())
 # shell._write("ls\n".encode())
 
-x = subprocess.check_output(['ls', '-l'])
-print(x)
+# x = subprocess.check_output(['ls', '-l']).decode('utf-8')
+# print(x)
+llmCommand = ['/Users/jgras/Ai/llama.cpp/main -m /Users/jgras/Ai/models/mistral-7b-v0.1.Q4_K_M.gguf \
+  --color \
+  --ctx_size 2048 \
+  -n -1 \
+  -ins -b 128 \
+  --top_k 10000 \
+  --temp 0.2 \
+  --repeat_penalty 1.1 \
+  --n-gpu-layers 30 \
+  -t 8']
+process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+out, err = process.communicate(llmCommand[0].encode())
+# myout, juan = process.communicate('ls -la'.encode())
+
+print(out)
