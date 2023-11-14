@@ -11,35 +11,41 @@ class LocalShell(object):
 
     def run(self):
         env = os.environ.copy()
-        p = Popen('/bin/bash', stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT, shell=True, env=env)
+        self.process = Popen('/bin/bash', stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT, env=env)
         sys.stdout.write("Started Local Terminal...\r\n\r\n")
 
-        def writeall(p):
+        def writeall():
             while True:
                 # print("read data: ")
-                data = p.stdout.read(1).decode("utf-8")
+                data = self.process.stdout.read(1).decode("utf-8")
                 if not data:
+                    print("Am I last")
                     break
                 sys.stdout.write(data)
                 sys.stdout.flush()
+                # print(data)
 
-        writer = threading.Thread(target=writeall, args=(p,))
+        writer = threading.Thread(target=writeall)
         writer.start()
 
-        try:
-            while True:
-                d = sys.stdin.read(1)
-                if not d:
-                    break
-                self._write(p, d.encode())
+        # try:
+        #     while True:
+        #         d = sys.stdin.read(1)
+        #         if not d:
+        #             break
+        #         self._write(self.process, d.encode())
 
-        except EOFError:
-            pass
+        # except EOFError:
+        #     pass
+        # self._write( "ls\n".encode())
 
-    def _write(self, process, message):
-        process.stdin.write(message)
-        process.stdin.flush()
+    def _write(self, message):
+        self.process.stdin.write(message)
+        self.process.stdin.flush()
 
 
 shell = LocalShell()
 shell.run()
+
+shell._write("ls\n".encode())
+shell._write("ls\n".encode())
