@@ -50,3 +50,27 @@ results = collection.query(
 print("\n")
 print(results)
 
+def create_and_load_collection(collectionName, documents, metadatas, collectionIds, persistent=False):
+    if not testPersistent :
+        # Get the chroma client and set it to use duckdb+parquet (a normal db like sqlite3 and the parquet file format [which is column oriented])
+        client = chromadb.Client()
+    else:
+        # Get a chromadb persistent (data remains after the end of the execution) client
+        client = chromadb.PersistentClient(path="./db")
+
+    # Create a collection (think of it like it's an sql table)
+    collection = client.get_or_create_collection(name=collectionName)
+
+    # Add the data to the collection
+    collection.add(
+        documents = documents,
+        metadatas = metadatas,
+        ids = collectionIds
+    )
+
+    # results = collection.query(
+    #     query_texts=["What is the university name?"],
+    #     n_results=2
+    # )
+
+    return collection
