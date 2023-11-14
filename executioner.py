@@ -44,8 +44,11 @@ class LocalShell(object):
         self.process.stdin.flush()
 
 
-shell = LocalShell()
-shell.run()
+# shell = LocalShell()
+# shell.run()
 
-shell._write("ls\n".encode())
-shell._write("ls\n".encode())
+# shell._write("ls\n".encode())
+# shell._write("ls\n".encode())
+
+x = subprocess.check_output(['ls', '-l'])
+print(x)
