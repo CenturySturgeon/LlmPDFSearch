@@ -1,31 +1,45 @@
+import sys
+import os
 import subprocess
+from subprocess import Popen, PIPE
+import threading
 
-def execute_python_interactive(commands):
-    try:
-        # Construct the command to run Python in interactive mode with the specified commands
-        python_command = '\n'.join(commands) + '\nexit()'
 
-        # Run the Python command and capture the output
-        result = subprocess.run(['python', '-i'], input=python_command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-        
-        # Print the output
-        print("Python Interactive Output:")
-        print(result.stdout)
-        
-        # Print any errors, if present
-        if result.stderr:
-            print("Errors:")
-            print(result.stderr)
-    
-    except subprocess.CalledProcessError as e:
-        print(f"Error executing Python interactive command: {e}")
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+class LocalShell(object):
+    def __init__(self):
+        pass
 
-# Example: execute multiple commands in Python terminal
-python_commands = [
-    "print('Hello from inside the Python terminal')",
-    "x = 42",
-    "print('The value of x is:', x)"
-]
-execute_python_interactive(python_commands)
+    def run(self):
+        env = os.environ.copy()
+        p = Popen('/bin/bash', stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT, shell=True, env=env)
+        sys.stdout.write("Started Local Terminal...\r\n\r\n")
+
+        def writeall(p):
+            while True:
+                # print("read data: ")
+                data = p.stdout.read(1).decode("utf-8")
+                if not data:
+                    break
+                sys.stdout.write(data)
+                sys.stdout.flush()
+
+        writer = threading.Thread(target=writeall, args=(p,))
+        writer.start()
+
+        try:
+            while True:
+                d = sys.stdin.read(1)
+                if not d:
+                    break
+                self._write(p, d.encode())
+
+        except EOFError:
+            pass
+
+    def _write(self, process, message):
+        process.stdin.write(message)
+        process.stdin.flush()
+
+
+shell = LocalShell()
+shell.run()
