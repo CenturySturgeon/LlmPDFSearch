@@ -1,17 +1,13 @@
-import wexpect
+import pexpect
+from pexpect.popen_spawn import PopenSpawn
 
-# Replace this with the actual command you want to execute
-command = "ping google.com"
+command = 'cmd'
+child = PopenSpawn(command)
+child.expect('>')
+child.sendline('help color')
+child.expect('>')
+output = child.before.decode("cp437")  # Decode the output from bytes to string
+lines = output.splitlines()  # Split the output into separate lines
 
-# Spawn a command prompt and execute the specified command
-child = wexpect.spawn(command)
-
-# Expect for a certain pattern in the output
-# In this case, we are expecting to see 'Reply' which is part of the output of 'ping' command
-index = child.expect(['Reply', wexpect.EOF])
-
-# Print the output
-print(child.before)
-
-# Close the child process
-child.close()
+for line in lines:
+    print(line)
