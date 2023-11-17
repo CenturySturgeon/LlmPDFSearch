@@ -3,6 +3,7 @@ import os
 import subprocess
 from subprocess import Popen, PIPE
 import threading
+import time
 
 
 class LocalShell(object):
@@ -22,10 +23,12 @@ class LocalShell(object):
                     break
                 sys.stdout.write(data)
                 sys.stdout.flush()
+                if data == '>':
+                    print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
         writer = threading.Thread(target=writeall)
+        writer.daemon = True
         writer.start()
-
         # try:
         #     while True:
         #         d = sys.stdin.read(1)
@@ -47,3 +50,7 @@ class LocalShell(object):
 shell = LocalShell()
 shell.run()
 shell._write("systeminfo\n".encode())
+# jaun = shell.process.communicate()
+time.sleep(10)
+print('DDDDSDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
+shell.kill()
