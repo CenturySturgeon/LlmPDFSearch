@@ -20,24 +20,16 @@ class LocalShell(object):
                 # print("read data: ")
                 data = self.process.stdout.read(1).decode("cp437")
                 if not data:
+                    print("ENDED COMMMAND")
                     break
                 sys.stdout.write(data)
                 sys.stdout.flush()
                 if data == '>':
-                    print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
+                    print("COMPLETED CMD COMMAND")
 
         writer = threading.Thread(target=writeall)
         writer.daemon = True
         writer.start()
-        # try:
-        #     while True:
-        #         d = sys.stdin.read(1)
-        #         if not d:
-        #             break
-        #         self._write(p, d.encode(encoding="cp437"))
-
-        # except EOFError:
-        #     pass
 
     def _write(self, message):
         self.process.stdin.write(message)
@@ -49,8 +41,6 @@ class LocalShell(object):
 
 shell = LocalShell()
 shell.run()
-shell._write("systeminfo\n".encode())
-# jaun = shell.process.communicate()
-time.sleep(10)
-print('DDDDSDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD')
-shell.kill()
+shell._write("python -c \"print('Hello from nested subprocess!')\" \n".encode())
+shell._write("python -c \"print('Hello from nested subprocess!')\" \n".encode())
+time.sleep(5)
