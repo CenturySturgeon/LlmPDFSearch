@@ -38,7 +38,10 @@ class LocalShell(object):
                     pass
 
         writer = threading.Thread(target=writeall)
-        writer.daemon = True
+         # Give the thread time to initialize
+        time.sleep(1)
+        # Daemon threads can be abruptly interrupted (program does not wait for them to finish in order to close)
+        # writer.daemon = True
         writer.start()
 
     def _write(self, message):
@@ -53,4 +56,7 @@ shell = LocalShell()
 shell.run()
 shell._write("print('Hello from nested subprocess!')\n".encode())
 shell._write("print('Hello from nested subprocess!')\n".encode())
-time.sleep(5)
+shell._write("exit()\n".encode())
+# shell._write("exit\n".encode())
+# time.sleep(5)
+shell.kill()
