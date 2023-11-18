@@ -3,67 +3,54 @@ import os
 import subprocess
 from subprocess import Popen, PIPE
 import threading
+import time
 
 
 class LocalShell(object):
     def __init__(self):
-        pass
+
+        # Get the name of the operating system
+        os_name = os.name
+        self.encoder = 'utf-8'
+
+        if os_name == 'nt':
+            # Windows OS detected
+            self.encoder = 'cp437'
+        
+        self.process = None
 
     def run(self):
         env = os.environ.copy()
-        self.process = Popen('/bin/bash', stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT, env=env)
+        self.process = Popen('python -i', stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT, shell=True, env=env)
         sys.stdout.write("Started Local Terminal...\r\n\r\n")
 
         def writeall():
             while True:
                 # print("read data: ")
-                data = self.process.stdout.read(1).decode("utf-8")
+                data = self.process.stdout.read(1).decode(self.encoder)
                 if not data:
-                    print("Am I last")
+                    print("ENDED COMMMAND")
                     break
                 sys.stdout.write(data)
                 sys.stdout.flush()
-                # print(data)
+                if data == '>':
+                    # print("COMPLETED CMD COMMAND")
+                    pass
 
         writer = threading.Thread(target=writeall)
+        writer.daemon = True
         writer.start()
-
-        # try:
-        #     while True:
-        #         d = sys.stdin.read(1)
-        #         if not d:
-        #             break
-        #         self._write(self.process, d.encode())
-
-        # except EOFError:
-        #     pass
-        # self._write( "ls\n".encode())
 
     def _write(self, message):
         self.process.stdin.write(message)
         self.process.stdin.flush()
 
+    def kill(self):
+        self.process.kill()
 
-# shell = LocalShell()
-# shell.run()
 
-# shell._write("ls\n".encode())
-# shell._write("ls\n".encode())
-
-# x = subprocess.check_output(['ls', '-l']).decode('utf-8')
-# print(x)
-llmCommand = ['/Users/jgras/Ai/llama.cpp/main -m /Users/jgras/Ai/models/mistral-7b-v0.1.Q4_K_M.gguf \
-  --color \
-  --ctx_size 2048 \
-  -n -1 \
-  -ins -b 128 \
-  --top_k 10000 \
-  --temp 0.2 \
-  --repeat_penalty 1.1 \
-  --n-gpu-layers 30 \
-  -t 8']
-process = subprocess.Popen('/bin/bash', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-out, err = process.communicate(llmCommand[0].encode())
-# myout, juan = process.communicate('ls -la'.encode())
-
-print(out)
+shell = LocalShell()
+shell.run()
+shell._write("print('Hello from nested subprocess!')\n".encode())
+shell._write("print('Hello from nested subprocess!')\n".encode())
+time.sleep(5)
