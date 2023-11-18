@@ -12,7 +12,7 @@ class LocalShell(object):
 
     def run(self):
         env = os.environ.copy()
-        self.process = Popen('cmd', stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT, shell=True, env=env)
+        self.process = Popen('python -i', stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT, shell=True, env=env)
         sys.stdout.write("Started Local Terminal...\r\n\r\n")
 
         def writeall():
@@ -25,7 +25,8 @@ class LocalShell(object):
                 sys.stdout.write(data)
                 sys.stdout.flush()
                 if data == '>':
-                    print("COMPLETED CMD COMMAND")
+                    # print("COMPLETED CMD COMMAND")
+                    pass
 
         writer = threading.Thread(target=writeall)
         writer.daemon = True
@@ -41,6 +42,6 @@ class LocalShell(object):
 
 shell = LocalShell()
 shell.run()
-shell._write("python -c \"print('Hello from nested subprocess!')\" \n".encode())
-shell._write("python -c \"print('Hello from nested subprocess!')\" \n".encode())
+shell._write("print('Hello from nested subprocess!')\n".encode())
+shell._write("print('Hello from nested subprocess!')\n".encode())
 time.sleep(5)
