@@ -1,62 +1,36 @@
-import sys
-import os
 import subprocess
-from subprocess import Popen, PIPE
-import threading
 import time
 
+# Create subprocess
+process = subprocess.Popen('python -i', stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
 
-class LocalShell(object):
-    def __init__(self):
+# List of example commands to execute in the Python interactive shell
+commands = [
+    "print('Hello, World!')\n",
+    "print('Hello, World!')\n",
+    "exit()\n",
+]
 
-        # Get the name of the operating system
-        os_name = os.name
-        self.encoder = 'utf-8'
+# Send commands to the interactive shell
+for cmd in commands:
+    process.stdin.write(cmd)
+    process.stdin.flush()
 
-        if os_name == 'nt':
-            # Windows OS detected
-            self.encoder = 'cp437'
-        
-        self.process = None
+# Close the stdin to signal that no more input will be sent
+# process.stdin.close()
 
-    def run(self):
-        env = os.environ.copy()
-        self.process = Popen('python -i', stdin=PIPE, stdout=PIPE, stderr=subprocess.STDOUT, shell=True, env=env)
-        sys.stdout.write("Started Local Terminal...\r\n\r\n")
+# Read output from the subprocess
+# for line in process.stdout:
+#     print(line.strip())
 
-        def writeall():
-            while True:
-                # print("read data: ")
-                data = self.process.stdout.read(1).decode(self.encoder)
-                if not data:
-                    print("ENDED COMMMAND")
-                    break
-                sys.stdout.write(data)
-                sys.stdout.flush()
-                if data == '>':
-                    # print("COMPLETED CMD COMMAND")
-                    pass
+time.sleep(4)
 
-        writer = threading.Thread(target=writeall)
-         # Give the thread time to initialize
-        time.sleep(1)
-        # Daemon threads can be abruptly interrupted (program does not wait for them to finish in order to close)
-        # writer.daemon = True
-        writer.start()
+print(process.stdout.readlines())
 
-    def _write(self, message):
-        self.process.stdin.write(message)
-        self.process.stdin.flush()
+# Wait for the process to finish and get the return code
+return_code = process.wait()
 
-    def kill(self):
-        self.process.kill()
-
-
-shell = LocalShell()
-shell.run()
-shell._write("print('Hello from nested subprocess!')\n".encode())
-shell._write("print('Hello from nested subprocess!')\n".encode())
-shell._write("exit()\n".encode())
-# shell._write("exit\n".encode())
-# time.sleep(5)
-shell.kill()
+if return_code == 0:
+    print("Commands executed successfully.")
+else:
+    print("Commands failed.")
