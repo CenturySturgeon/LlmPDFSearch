@@ -8,16 +8,14 @@ import time
 
 class LocalShell(object):
     def __init__(self):
-
-        # Get the name of the operating system
         os_name = os.name
         self.encoder = 'utf-8'
 
         if os_name == 'nt':
-            # Windows OS detected
             self.encoder = 'cp437'
         
         self.process = None
+        self.command_completed = False  # Flag to indicate command completion
 
     def run(self):
         env = os.environ.copy()
@@ -26,28 +24,29 @@ class LocalShell(object):
 
         def listen():
             while True:
-                # print("read data: ")
-                data = self.process.stdout.read()
+                data = self.process.stdout.readline()  # Read line by line
                 if not data:
-                    print("ENDED COMMMAND")
+                    print("ENDED PROCESS")
                     break
-                # sys.stdout.write(data)
+                # print(data.decode(self.encoder).strip())
                 print(data)
+                if b"\r\n" in data:
+                    self.command_completed = True  # Set flag when command completes
                 sys.stdout.flush()
-                if data == '>':
-                    # print("COMPLETED CMD COMMAND")
-                    pass
 
         writer = threading.Thread(target=listen)
-         # Give the thread time to initialize
         time.sleep(1)
-        # Daemon threads can be abruptly interrupted (program does not wait for them to finish in order to close)
-        # writer.daemon = True
         writer.start()
 
     def _write(self, message):
         self.process.stdin.write(message)
         self.process.stdin.flush()
+        self.command_completed = False  # Reset flag before sending a command
+
+    def wait_for_command_completion(self):
+        while not self.command_completed:
+            time.sleep(0.1)  # Wait until the command is completed
+        print("uaaaaaa")
 
     def kill(self):
         self.process.kill()
@@ -56,8 +55,10 @@ class LocalShell(object):
 shell = LocalShell()
 shell.run()
 shell._write("print('Hello from nested subprocess!')\n".encode())
+shell.wait_for_command_completion()  # Wait for the command to complete
+shell._write("import time\ntime.sleep(3)\nprint('Hello from nested subprocess!')\n".encode())
+shell.wait_for_command_completion()  # Wait for the command to complete
 shell._write("print('Hello from nested subprocess!')\n".encode())
+shell.wait_for_command_completion()  # Wait for the command to complete
 shell._write("exit()\n".encode())
-# shell._write("exit\n".encode())
-# time.sleep(5)
 shell.kill()
