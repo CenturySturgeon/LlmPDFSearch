@@ -16,6 +16,7 @@ class LocalShell(object):
         
         self.process = None
         self.command_completed = False  # Flag to indicate command completion
+        self.commandOutput = ''
 
     def run(self):
         env = os.environ.copy()
@@ -24,13 +25,13 @@ class LocalShell(object):
 
         def listen():
             while True:
-                data = self.process.stdout.readline()  # Read line by line
+                data = self.process.stdout.read(1)  # Read line by line
                 if not data:
                     print("ENDED PROCESS")
                     break
                 # print(data.decode(self.encoder).strip())
-                print(data)
-                if b"\r\n" in data:
+                self.commandOutput += (data.decode(self.encoder))
+                if b"\r" in data:
                     self.command_completed = True  # Set flag when command completes
                 sys.stdout.flush()
 
@@ -39,6 +40,7 @@ class LocalShell(object):
         writer.start()
 
     def _write(self, message):
+        self.commandOutput = ''
         self.process.stdin.write(message)
         self.process.stdin.flush()
         self.command_completed = False  # Reset flag before sending a command
@@ -56,8 +58,11 @@ shell = LocalShell()
 shell.run()
 shell._write("print('Hello from nested subprocess!')\n".encode())
 shell.wait_for_command_completion()  # Wait for the command to complete
+# print(shell.commandOutput)
 shell._write("import time\ntime.sleep(3)\nprint('Hello from nested subprocess!')\n".encode())
 shell.wait_for_command_completion()  # Wait for the command to complete
+print(shell.commandOutput)
+
 shell._write("print('Hello from nested subprocess!')\n".encode())
 shell.wait_for_command_completion()  # Wait for the command to complete
 shell._write("exit()\n".encode())
