@@ -16,7 +16,7 @@ else:
 # Create a collection (think of it like it's an sql table)
 collection = client.get_or_create_collection(name="Students")
 
-class ChromaQuery(BaseModel):
+class ChromaPrompt(BaseModel):
     userPrompt: str
     collection: str | None = None
     n_results: int | None = 1
@@ -47,9 +47,9 @@ def append_result(chromaResults: chromadb.QueryResult):
     
     return results
 
-@app.post("/query/")
-async def create_item(chromaQuery: ChromaQuery):
-    
+@app.post("/chroma/")
+async def get_chroma_embeddings(chromaQuery: ChromaPrompt):
+
     results = collection.query(
         query_texts = [chromaQuery.userPrompt],
         n_results = chromaQuery.n_results
