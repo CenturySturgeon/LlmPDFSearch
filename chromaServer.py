@@ -99,8 +99,8 @@ async def create_item(chromaQuery: ChromaQuery):
     print(chromaQuery.n_results)
 
     results = collection.query(
-        query_texts=["What is the university name?"],
-        n_results=2
+        query_texts = [chromaQuery.userPrompt],
+        n_results = chromaQuery.n_results
     )
 
     response = Embedding(userPrompt=chromaQuery.userPrompt, resources=append_result(results) )
