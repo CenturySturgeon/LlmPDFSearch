@@ -1,8 +1,16 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 import chromadb
-from chromadb.config import Settings
-from typing import List
+from models import *
+
+def get_chroma_client(persistent: bool = False):
+    if persistent :
+        # Get a chromadb persistent (data remains after the end of the execution) client
+        client = chromadb.PersistentClient(path="./db")
+    else:
+        # Get the non-persistent chroma client
+        client = chromadb.Client()
+    
+    return client
 
 testPersistent = True
 
@@ -15,27 +23,6 @@ else:
 
 # Create a collection (think of it like it's an sql table)
 collection = client.get_or_create_collection(name="Students")
-
-class ChromaPrompt(BaseModel):
-    userPrompt: str
-    collection: str | None = None
-    n_results: int | None = 1
-
-class ChromaResult(BaseModel):
-    id: str
-    source: str
-    info: str
-    
-class Embedding(BaseModel):
-    userPrompt: str
-    resources: List
-
-class Item(BaseModel):
-    name: str
-    description: str | None = None
-    price: float
-    tax: float | None = None
-
 
 app = FastAPI()
 
@@ -57,3 +44,14 @@ async def get_chroma_embeddings(chromaQuery: ChromaPrompt):
 
     response = Embedding(userPrompt=chromaQuery.userPrompt, resources=append_result(results) )
     return response
+
+@app.post("/chroma/collections/")
+async def create_collection(chromaCollection: ChromaCollection):
+
+    try:
+        client = get_chroma_client(chromaCollection.isPersistent)
+        client.get_or_create_collection(name = chromaCollection.name)
+        return {'message:' : f'Successfully created new chroma collection "{chromaCollection.name}"'}
+    except:
+        return {'message:' : 'An error ocurred when creating the new chroma collection'}
+    
