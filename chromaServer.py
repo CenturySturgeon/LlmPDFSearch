@@ -12,20 +12,6 @@ def get_chroma_client(persistent: bool = False):
     
     return client
 
-testPersistent = True
-
-if not testPersistent :
-    # Get the chroma client and set it to use duckdb+parquet (a normal db like sqlite3 and the parquet file format [which is column oriented])
-    client = chromadb.Client()
-else:
-    # Get a chromadb persistent (data remains after the end of the execution) client
-    client = chromadb.PersistentClient(path="./db")
-
-# Create a collection (think of it like it's an sql table)
-collection = client.get_or_create_collection(name="Students")
-
-print(client.list_collections())
-
 app = FastAPI()
 
 def append_result(chromaResults: chromadb.QueryResult):
@@ -38,6 +24,9 @@ def append_result(chromaResults: chromadb.QueryResult):
 
 @app.post("/chroma/")
 async def get_chroma_embeddings(chromaQuery: ChromaPrompt):
+
+    client = get_chroma_client(chromaQuery.isPersistent)
+    collection = client.get_collection(chromaQuery.collectionName)
 
     results = collection.query(
         query_texts = [chromaQuery.userPrompt],
