@@ -3,7 +3,8 @@ from typing import List
 
 class ChromaPrompt(BaseModel):
     userPrompt: str
-    collection: str | None = None
+    collectionName: str
+    isPersistent: bool | None = False
     n_results: int | None = 1
 
 class ChromaResult(BaseModel):
