@@ -24,6 +24,8 @@ else:
 # Create a collection (think of it like it's an sql table)
 collection = client.get_or_create_collection(name="Students")
 
+print(client.list_collections())
+
 app = FastAPI()
 
 def append_result(chromaResults: chromadb.QueryResult):
@@ -55,3 +57,10 @@ async def create_collection(chromaCollection: ChromaCollection):
     except:
         return {'message:' : 'An error ocurred when creating the new chroma collection'}
     
+@app.get("/chroma/collections/")
+async def get_collections(isPersistent : bool = False):
+
+    client = get_chroma_client(isPersistent)
+    chromaCollections = [collection.name for collection in client.list_collections()]
+
+    return {'Persistent Collections' : isPersistent, 'collections': chromaCollections}
