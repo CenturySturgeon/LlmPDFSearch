@@ -12,15 +12,15 @@ def get_chroma_client(persistent: bool = False):
     
     return client
 
-app = FastAPI()
-
-def append_result(chromaResults: chromadb.QueryResult):
-    results = []
+def format_chroma_resutls(chromaResults: chromadb.QueryResult):
+    formatted_results = []
     for i in range(0, len(chromaResults['ids'][0])):
         result = ChromaResult(id = chromaResults['ids'][0][i], source = chromaResults['metadatas'][0][i]['source'], info = chromaResults['documents'][0][i])
-        results.append(result)
+        formatted_results.append(result)
     
-    return results
+    return formatted_results
+
+app = FastAPI()
 
 @app.post("/chroma/")
 async def get_chroma_embeddings(chromaQuery: ChromaPrompt):
@@ -32,8 +32,8 @@ async def get_chroma_embeddings(chromaQuery: ChromaPrompt):
         query_texts = [chromaQuery.userPrompt],
         n_results = chromaQuery.n_results
     )
-
-    response = Embedding(userPrompt=chromaQuery.userPrompt, resources=append_result(results) )
+    response = InContextResponse(userPrompt=chromaQuery.userPrompt, resources=format_chroma_resutls(results) )
+    
     return response
 
 @app.post("/chroma/collections/")
@@ -42,7 +42,9 @@ async def create_collection(chromaCollection: ChromaCollection):
     try:
         client = get_chroma_client(chromaCollection.isPersistent)
         client.get_or_create_collection(name = chromaCollection.name)
+
         return {'message:' : f'Successfully created new chroma collection "{chromaCollection.name}"'}
+    
     except:
         return {'message:' : 'An error ocurred when creating the new chroma collection'}
     

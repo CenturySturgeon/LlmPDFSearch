@@ -12,7 +12,7 @@ class ChromaResult(BaseModel):
     source: str
     info: str
     
-class Embedding(BaseModel):
+class InContextResponse(BaseModel):
     userPrompt: str
     resources: List
 
