@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import chromadb
 from models import *
 
-def get_chroma_client(persistent: bool = False):
+def get_chroma_client(persistent: bool = False) -> chromadb.ClientAPI:
     if persistent :
         # Get a chromadb persistent (data remains after the end of the execution) client
         client = chromadb.PersistentClient(path="./db")
@@ -12,7 +12,7 @@ def get_chroma_client(persistent: bool = False):
     
     return client
 
-def format_chroma_resutls(chromaResults: chromadb.QueryResult):
+def format_chroma_resutls(chromaResults: chromadb.QueryResult) -> List[ChromaResult]:
     formatted_results = []
     for i in range(0, len(chromaResults['ids'][0])):
         result = ChromaResult(id = chromaResults['ids'][0][i], source = chromaResults['metadatas'][0][i]['source'], info = chromaResults['documents'][0][i])

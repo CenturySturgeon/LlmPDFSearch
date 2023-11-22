@@ -23,7 +23,7 @@ UW encompasses over 500 buildings and 20 million square feet of space,
 including one of the largest library systems in the world.
 """
 
-testPersistent = False
+testPersistent = True
 
 if not testPersistent :
     # Get the chroma client and set it to use duckdb+parquet (a normal db like sqlite3 and the parquet file format [which is column oriented])
