@@ -55,3 +55,7 @@ async def get_collections(isPersistent : bool = False):
     chromaCollections = [collection.name for collection in client.list_collections()]
 
     return {'Persistent Collections' : isPersistent, 'collections': chromaCollections}
+
+@app.post("/chroma/collections/documents")
+async def add_collection_document(document: ChromaDocument):
+    return document

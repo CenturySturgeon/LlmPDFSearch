@@ -19,3 +19,13 @@ class InContextResponse(BaseModel):
 class ChromaCollection(BaseModel):
     name: str
     isPersistent: bool | None = False
+
+class MetaDatas(BaseModel):
+    source: str
+
+class ChromaDocument(BaseModel):
+    collection: str
+    ids: List[str]
+    bodies: List[str]
+    metadatas: List[MetaDatas]
+    
