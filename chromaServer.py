@@ -58,4 +58,14 @@ async def get_collections(isPersistent : bool = False):
 
 @app.post("/chroma/collections/documents")
 async def add_collection_document(document: ChromaDocument):
+    client = get_chroma_client(document.isPersistent)
+    collection = client.get_or_create_collection(document.collection)
+
+    # Add documents to the collection
+    collection.add(
+        documents = document.bodies,
+        metadatas = document.metadatas,
+        ids = document.ids
+    )
+
     return document
