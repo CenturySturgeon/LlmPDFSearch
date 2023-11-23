@@ -25,6 +25,7 @@ class MetaDatas(BaseModel):
 
 class ChromaDocument(BaseModel):
     collection: str
+    isPersistent: bool | None = False
     ids: List[str]
     bodies: List[str]
     metadatas: List[MetaDatas]
