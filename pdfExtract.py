@@ -56,3 +56,31 @@ print(len(docs), len(mets), len(ids))
 
 chunks = split_pdf_by_chunks('TheRoadNotTaken.pdf',1200)
 print(chunks[0])
+
+#Create a chroma collection and add the pdf data
+isPersistent = True
+
+if not isPersistent :
+    # Get the chroma client and set it to use duckdb+parquet (a normal db like sqlite3 and the parquet file format [which is column oriented])
+    client = chromadb.Client()
+else:
+    # Get a chromadb persistent (data remains after the end of the execution) client
+    client = chromadb.PersistentClient(path="./db")
+
+# Create a collection (think of it like it's an sql table)
+collection = client.get_or_create_collection(name="TheRoadNotTaken")
+
+# Add the data to the collection
+# collection.add(
+#     documents = docs,
+#     metadatas = mets,
+#     ids = ids
+# )
+
+results = collection.query(
+    query_texts=["What was going on when the ship came out of the hyperdrive?"],
+    n_results=5
+)
+
+print("\n")
+print(results)
