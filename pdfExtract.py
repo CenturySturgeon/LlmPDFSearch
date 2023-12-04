@@ -71,11 +71,11 @@ else:
 collection = client.get_or_create_collection(name="UN_Climate_Change")
 
 # Add the data to the collection
-# collection.add(
-#     documents = docs,
-#     metadatas = mets,
-#     ids = ids
-# )
+collection.add(
+    documents = docs,
+    metadatas = mets,
+    ids = ids
+)
 
 results = collection.query(
     query_texts=["what is climate change?"],
