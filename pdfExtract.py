@@ -49,12 +49,12 @@ def split_pdf_by_chunks(pdf_path, chunk_size=500):
 
 
 # Replace 'your_pdf_file.pdf' with the path to your PDF file
-pdf_path = 'TheRoadNotTaken.pdf'
+pdf_path = 'UN_Climate_Change.pdf'
 docs, mets, ids = extract_pdf_sections(pdf_path)
 
 print(len(docs), len(mets), len(ids))
 
-chunks = split_pdf_by_chunks('TheRoadNotTaken.pdf',1200)
+chunks = split_pdf_by_chunks('UN_Climate_Change.pdf',1200)
 print(chunks[0])
 
 #Create a chroma collection and add the pdf data
@@ -68,7 +68,7 @@ else:
     client = chromadb.PersistentClient(path="./db")
 
 # Create a collection (think of it like it's an sql table)
-collection = client.get_or_create_collection(name="TheRoadNotTaken")
+collection = client.get_or_create_collection(name="UN_Climate_Change")
 
 # Add the data to the collection
 # collection.add(
@@ -78,7 +78,7 @@ collection = client.get_or_create_collection(name="TheRoadNotTaken")
 # )
 
 results = collection.query(
-    query_texts=["What was going on when the ship came out of the hyperdrive?"],
+    query_texts=["what is climate change?"],
     n_results=5
 )
 
