@@ -47,40 +47,72 @@ def split_pdf_by_chunks(pdf_path, chunk_size=500):
     pdf_document.close()
     return chunks_list
 
+def split_by_wordCount(pdf_path, minWords=300):
+    pdf_document = fitz.open(pdf_path)
+    chunks_list = []
+
+    for page_num in range(pdf_document.page_count):
+        page = pdf_document.load_page(page_num)
+        text = page.get_text("text")
+        if page_num > 6:
+            initialIndex = 0
+            counter = 0
+            for i in range(len(text)):
+                char = text[i]
+                if char == " ":
+                    counter += 1
+                elif (char == "\n" or char == '.') and counter>= minWords:
+                    chunks_list.append(text[0:i+1])
+                    counter = 0
+                    initialIndex = i + 1
+            
+            if initialIndex == 0:
+                chunks_list.append(text)
+
+    return chunks_list
+                 
+
+
+
+    pdf_document.close()
+    return chunks_list
+
 
 # Replace 'your_pdf_file.pdf' with the path to your PDF file
 pdf_path = 'UN_Climate_Change.pdf'
 docs, mets, ids = extract_pdf_sections(pdf_path)
 
-print(len(docs), len(mets), len(ids))
+# print(len(docs), len(mets), len(ids))
 
 chunks = split_pdf_by_chunks('UN_Climate_Change.pdf',1200)
-print(chunks[0])
+# print(chunks[1])
 
-#Create a chroma collection and add the pdf data
-isPersistent = True
+chunks = split_by_wordCount('UN_Climate_Change.pdf', 80)
+print(chunks[3])
+# #Create a chroma collection and add the pdf data
+# isPersistent = True
 
-if not isPersistent :
-    # Get the chroma client and set it to use duckdb+parquet (a normal db like sqlite3 and the parquet file format [which is column oriented])
-    client = chromadb.Client()
-else:
-    # Get a chromadb persistent (data remains after the end of the execution) client
-    client = chromadb.PersistentClient(path="./db")
+# if not isPersistent :
+#     # Get the chroma client and set it to use duckdb+parquet (a normal db like sqlite3 and the parquet file format [which is column oriented])
+#     client = chromadb.Client()
+# else:
+#     # Get a chromadb persistent (data remains after the end of the execution) client
+#     client = chromadb.PersistentClient(path="./db")
 
-# Create a collection (think of it like it's an sql table)
-collection = client.get_or_create_collection(name="UN_Climate_Change")
+# # Create a collection (think of it like it's an sql table)
+# collection = client.get_or_create_collection(name="UN_Climate_Change")
 
-# Add the data to the collection
-collection.add(
-    documents = docs,
-    metadatas = mets,
-    ids = ids
-)
+# # Add the data to the collection
+# collection.add(
+#     documents = docs,
+#     metadatas = mets,
+#     ids = ids
+# )
 
-results = collection.query(
-    query_texts=["what is climate change?"],
-    n_results=5
-)
+# results = collection.query(
+#     query_texts=["what is climate change?"],
+#     n_results=5
+# )
 
-print("\n")
-print(results)
+# print("\n")
+# print(results)
