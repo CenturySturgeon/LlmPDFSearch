@@ -48,6 +48,7 @@ def split_pdf_by_chunks(pdf_path, chunk_size=500):
     return chunks_list
 
 def split_by_wordCount(pdf_path, minWords=300):
+    punctAndNums = ".:;!?12345678910"
     pdf_document = fitz.open(pdf_path)
     chunks_list = []
 
@@ -61,7 +62,7 @@ def split_by_wordCount(pdf_path, minWords=300):
                 char = text[i]
                 if char == " ":
                     counter += 1
-                elif (char == "\n" or char == '.') and counter>= minWords:
+                elif (char == "\n" or char == '.') and text[i-1] in punctAndNums and counter>= minWords:
                     chunks_list.append(text[0:i+1])
                     counter = 0
                     initialIndex = i + 1
